@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patients' History Management</title>
+
+<link rel="stylesheet" href="patients.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <i class="fas fa-shield-virus"></i>
+            <h2>ABC Admin</h2>
+        </div>
+
+        <ul>
+
+            <li>
+                <a href="dashboard.html">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li class="active">
+                <a href="#">
+                    <i class="fas fa-file-medical"></i>
+                    Patients' History
+                </a>
+            </li>
+
+            <li>
+                <a href="appointments.html">
+                    <i class="fas fa-calendar-check"></i>
+                    Appointments
+                </a>
+            </li>
+
+            <li>
+                <a href="billing.html">
+                    <i class="fas fa-money-bill"></i>
+                    Billing
+                </a>
+            </li>
+
+            <li>
+                <a href="vaccines.html">
+                    <i class="fas fa-syringe"></i>
+                    Vaccinations
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <div class="topbar">
+
+            <h1>Patients' History Management</h1>
+
+            <div class="admin-box">
+                <i class="fas fa-user-circle"></i>
+                Admin
+            </div>
+
+        </div>
+
+        <!-- FORM -->
+
+        <div class="card">
+
+            <h2>Patient Information Slip</h2>
+
+            <form id="patientHistoryForm">
+
+                <input type="hidden" id="editIndex">
+
+                <!-- ROW 1 -->
+
+                <div class="grid-2">
+
+                    <div>
+                        <label>Date</label>
+                        <input type="date" id="recordDate" required>
+                    </div>
+
+                    <div>
+                        <label>Time</label>
+                        <input type="time" id="recordTime" required>
+                    </div>
+
+                </div>
+
+                <!-- ROW 2 -->
+
+                <div class="grid-3">
+
+                    <input
+                    type="text"
+                    id="lastName"
+                    placeholder="Last Name"
+                    required>
+
+                    <input
+                    type="text"
+                    id="firstName"
+                    placeholder="First Name"
+                    required>
+
+                    <input
+                    type="text"
+                    id="middleInitial"
+                    placeholder="M.I">
+
+                </div>
+
+                <input
+                type="text"
+                id="address"
+                placeholder="Address"
+                required>
+
+                <div class="grid-4">
+
+                    <select id="gender">
+
+                        <option value="">
+                            Gender
+                        </option>
+
+                        <option>
+                            Male
+                        </option>
+
+                        <option>
+                            Female
+                        </option>
+
+                    </select>
+
+                    <input
+                    type="number"
+                    id="age"
+                    placeholder="Age">
+
+                    <input
+                    type="number"
+                    id="weight"
+                    placeholder="Weight (kg)">
+
+                    <input
+                    type="text"
+                    id="contact"
+                    placeholder="Contact Number">
+
+                </div>
+
+                <div class="grid-2">
+
+                    <input
+                    type="text"
+                    id="allergy"
+                    placeholder="Allergy">
+
+                    <input
+                    type="text"
+                    id="healthHistory"
+                    placeholder="Health History">
+
+                </div>
+
+                <h3>Vital Signs</h3>
+
+                <div class="grid-3">
+
+                    <input
+                    type="text"
+                    id="pulseRate"
+                    placeholder="Pulse Rate">
+
+                    <input
+                    type="text"
+                    id="bloodPressure"
+                    placeholder="Blood Pressure">
+
+                    <input
+                    type="text"
+                    id="cbg"
+                    placeholder="CBG">
+
+                </div>
+
+                <h3>History of Biting Incident</h3>
+
+                <div class="grid-3">
+
+                    <select id="biteSource">
+
+                        <option>
+                            Dog
+                        </option>
+
+                        <option>
+                            Cat
+                        </option>
+
+                        <option>
+                            Other
+                        </option>
+
+                    </select>
+
+                    <input
+                    type="date"
+                    id="dateExposure">
+
+                    <input
+                    type="text"
+                    id="placeExposure"
+                    placeholder="Place of Exposure">
+
+                </div>
+
+                <div class="grid-3">
+
+                    <select id="category">
+
+                        <option>
+                            Category 1
+                        </option>
+
+                        <option>
+                            Category 2
+                        </option>
+
+                        <option>
+                            Category 3
+                        </option>
+
+                    </select>
+
+                    <select id="biteType">
+
+                        <option>
+                            Bite
+                        </option>
+
+                        <option>
+                            Non-Bite
+                        </option>
+
+                    </select>
+
+                    <input
+                    type="text"
+                    id="remarks"
+                    placeholder="Remarks">
+
+                </div>
+
+                <h3>Consent for Treatment</h3>
+
+                <textarea
+                id="consent"
+                rows="4"
+                placeholder="Consent Information"></textarea>
+
+                <button type="submit">
+
+                    <i class="fas fa-save"></i>
+                    Save Record
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- RECORDS -->
+
+        <div class="card">
+
+            <div class="table-header">
+
+                <h2>Patients' History Records</h2>
+
+                <input
+                type="text"
+                id="searchPatient"
+                placeholder="Search Patient">
+
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Contact</th>
+                        <th>Bite Source</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="historyTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="patient-history.js"></script>
+
+</body>
+</html>

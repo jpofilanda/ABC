@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments Management</title>
+
+    <link rel="stylesheet" href="appointments.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>ABC Admin</h2>
+
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="patients.html">Patients</a></li>
+            <li><a href="appointments.html">Appointments</a></li>
+            <li><a href="billing.html">Billing</a></li>
+            <li><a href="vaccines.html">Vaccinations</a></li>
+        </ul>
+
+    </div>
+
+    <div class="main-content">
+
+        <h1>Appointment Management</h1>
+
+        <div class="form-container">
+
+            <form id="appointmentForm">
+
+                <input type="hidden" id="editIndex">
+
+                <input
+                    type="text"
+                    id="patientName"
+                    placeholder="Patient Name"
+                    required
+                >
+
+                <input
+                    type="date"
+                    id="appointmentDate"
+                    required
+                >
+
+                <input
+                    type="time"
+                    id="appointmentTime"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="purpose"
+                    placeholder="Purpose"
+                    required
+                >
+
+                <select id="status" required>
+                    <option value="">Select Status</option>
+                    <option>Pending</option>
+                    <option>Completed</option>
+                    <option>Cancelled</option>
+                </select>
+
+                <button type="submit">
+                    Save Appointment
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchAppointment"
+                placeholder="Search Appointment..."
+            >
+
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Purpose</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="appointmentTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="appointments.js"></script>
+
+</body>
+</html>

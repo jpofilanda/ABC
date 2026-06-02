@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Management</title>
+
+    <link rel="stylesheet" href="billing.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+
+        <h2>ABC Admin</h2>
+
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="patients.html">Patients</a></li>
+            <li><a href="appointments.html">Appointments</a></li>
+            <li><a href="billing.html">Billing</a></li>
+            <li><a href="vaccines.html">Vaccinations</a></li>
+        </ul>
+
+    </div>
+
+    <div class="main-content">
+
+        <h1>Billing Management</h1>
+
+        <div class="form-container">
+
+            <form id="billingForm">
+
+                <input type="hidden" id="editIndex">
+
+                <input
+                    type="text"
+                    id="billId"
+                    placeholder="Bill ID"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="patientName"
+                    placeholder="Patient Name"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="service"
+                    placeholder="Service"
+                    required
+                >
+
+                <input
+                    type="number"
+                    id="amount"
+                    placeholder="Amount"
+                    required
+                >
+
+                <select id="status" required>
+                    <option value="">Payment Status</option>
+                    <option>Paid</option>
+                    <option>Partial</option>
+                    <option>Unpaid</option>
+                </select>
+
+                <button type="submit">
+                    Save Bill
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchBill"
+                placeholder="Search Bill..."
+            >
+
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Bill ID</th>
+                        <th>Patient</th>
+                        <th>Service</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="billingTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="billing.js"></script>
+
+</body>
+</html>
