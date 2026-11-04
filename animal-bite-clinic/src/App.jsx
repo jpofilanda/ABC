@@ -5,21 +5,19 @@ import Header from "./Components/layout/Header";
 import NoticeBanner from "./Components/layout/NoticeBanner";
 import Sidebar from "./Components/layout/Sidebar";
 
-import AdminPage from "./Pages/AdminPage";
-import AppointmentsPage from "./Pages/AppointmentsPage";
-import BillingPage from "./Pages/BillingPage";
-import DashboardPage from "./Pages/DashboardPage";
-import PatientsPage from "./Pages/PatientsPage";
+import AdminPage from "./pages/AdminPage";
+import AppointmentsPage from "./pages/AppointmentsPage";
+import BillingPage from "./pages/BillingPage";
+import DashboardPage from "./pages/DashboardPage";
+import PatientsPage from "./pages/PatientsPage";
 
 import { navItems } from "./constants/navItems";
 import {
   emptyAppointment,
   emptyBill,
   emptyPatient,
-  initialAppointments,
-  initialBills,
-  initialPatients,
 } from "./constants/initialData";
+import { api } from "./services/api";
 import { today } from "./utils/date";
 
 const makeFieldUpdater = (setter) => (field, value) =>
@@ -27,20 +25,19 @@ const makeFieldUpdater = (setter) => (field, value) =>
 
 function App() {
   const [page, setPage] = useState("dashboard");
-  const [patients, setPatients] = useState(
-    () =>
-      JSON.parse(localStorage.getItem("abc_patients") || "null") ||
-      initialPatients,
-  );
-  const [appointments, setAppointments] = useState(
-    () =>
-      JSON.parse(localStorage.getItem("abc_appointments") || "null") ||
-      initialAppointments,
-  );
-  const [bills, setBills] = useState(
-    () =>
-      JSON.parse(localStorage.getItem("abc_bills") || "null") || initialBills,
-  );
+  const [patients, setPatients] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [bills, setBills] = useState([]);
+
+  useEffect(() => {
+    Promise.all([api.getPatients(), api.getAppointments(), api.getBills()])
+      .then(([p, a, b]) => {
+        setPatients(p);
+        setAppointments(a);
+        setBills(b);
+      })
+      .catch(() => notify("Cannot reach the server. Is the API running?"), []);
+  });
 
   const [patientForm, setPatientForm] = useState(emptyPatient);
   const [appointmentForm, setAppointmentForm] = useState(emptyAppointment);
@@ -53,18 +50,6 @@ function App() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [adminMode, setAdminMode] = useState(false);
   const [notice, setNotice] = useState("");
-
-  useEffect(() => {
-    localStorage.setItem("abc_patients", JSON.stringify(patients));
-  }, [patients]);
-
-  useEffect(() => {
-    localStorage.setItem("abc_appointments", JSON.stringify(appointments));
-  }, [appointments]);
-
-  useEffect(() => {
-    localStorage.setItem("abc_bills", JSON.stringify(bills));
-  }, [bills]);
 
   const notify = (message) => {
     setNotice(message);
@@ -94,40 +79,56 @@ function App() {
   const updateAppointmentForm = makeFieldUpdater(setAppointmentForm);
   const updateBillForm = makeFieldUpdater(setBillForm);
 
-  const savePatient = (e) => {
+  const savePatient = async (e) => {
     e.preventDefault();
-    setPatients((old) => [
-      ...old,
-      { ...patientForm, id: Date.now(), date: today() },
-    ]);
-    setPatientForm(emptyPatient);
-    setShowPatientForm(false);
-    notify("Patient record saved.");
+    try {
+      const saved = await api.addPatient(patientForm);
+      setPatients((old) => [...old, saved]);
+      setPatientForm(emptyPatient);
+      setShowPatientForm(false);
+      notify("Patient record saved");
+    } catch (err) {
+      notify(err.message);
+    }
   };
 
-  const saveAppointment = (e) => {
+  const saveAppointment = async (e) => {
     e.preventDefault();
-    setAppointments((old) => [...old, { ...appointmentForm, id: Date.now() }]);
-    setAppointmentForm(emptyAppointment);
-    setShowAppointmentForm(false);
-    notify("Appointment saved.");
+
+    try {
+      const saved = await api.addAppointment(appointmentForm);
+      setAppointments((old) => [...old, saved]);
+      setAppointmentForm(emptyAppointment);
+      setShowAppointmentForm(false);
+      notify("Appointment saved.");
+    } catch (err) {
+      notify(err.message);
+    }
   };
 
-  const saveBill = (e) => {
+  const saveBill = async (e) => {
     e.preventDefault();
-    setBills((old) => [...old, { ...billForm, id: Date.now() }]);
-    setBillForm(emptyBill);
-    setShowBillForm(false);
-    notify("Billing record saved.");
+    try {
+      const saved = await api.addBill(billForm);
+      setBills((old) => [...old, saved]);
+      setBillForm(emptyBill);
+      setShowBillForm(false);
+      notify("Billing record saved.");
+    } catch (err) {
+      notify(err.message);
+    }
   };
 
-  const updateAppointmentStatus = (id, status) => {
-    setAppointments((old) =>
-      old.map((a) => (a.id === id ? { ...a, status } : a)),
-    );
+  const updateAppointmentStatus = async (id, status) => {
+    try {
+      const updated = await api.updateAppointment(id, { status });
+      setAppointments((old) => old.map((a) => (a.id === id ? updated : a)));
+    } catch (err) {
+      notify(err.message);
+    }
   };
 
-  const deleteAppointment = (id) => {
+  const deleteAppointment = async (id) => {
     if (!adminMode) {
       notify("Admin access is required.");
       return;
@@ -135,8 +136,13 @@ function App() {
     if (
       window.confirm("Delete this appointment permanently from this browser?")
     ) {
-      setAppointments((old) => old.filter((a) => a.id !== id));
-      notify("Appointment removed.");
+      try {
+        await api.deleteAppointment(id);
+        setAppointments((old) => old.filter((a) => a.id !== id));
+        notify("Appointment removed.");
+      } catch (err) {
+        notify(err.message);
+      }
     }
   };
 

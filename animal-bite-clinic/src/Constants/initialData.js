@@ -1,4 +1,4 @@
-import { today } from "../Utils/date";
+import { today } from "../utils/date";
 
 export const initialPatients = [
   {

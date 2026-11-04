@@ -5,13 +5,20 @@ import Table from "../ui/Table";
 
 const RANGE_OPTIONS = ["3", "7", "14", "30"];
 
-export default function AppointmentTable({ appointments, followUpDays, onFollowUpDaysChange, onStatusChange }) {
+export default function AppointmentTable({
+  appointments,
+  followUpDays,
+  onFollowUpDaysChange,
+  onStatusChange,
+}) {
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
       <div className="flex flex-col gap-4 border-b border-slate-100 p-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h3 className="font-bold">Follow-up appointments</h3>
-          <p className="mt-1 text-xs text-slate-500">Filter pending appointments by the next number of days.</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Filter pending appointments by the next number of days.
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {RANGE_OPTIONS.map((days) => (
@@ -23,12 +30,28 @@ export default function AppointmentTable({ appointments, followUpDays, onFollowU
               {days} days
             </button>
           ))}
-          <Button variant="secondary" onClick={() => onFollowUpDaysChange("36500")}>All pending</Button>
+          <Button
+            variant="secondary"
+            onClick={() => onFollowUpDaysChange("36500")}
+          >
+            All pending
+          </Button>
         </div>
       </div>
-      <Table columns={["Patient / Contact", "Date", "Time", "Purpose / Notes", "Status"]}>
+      <Table
+        columns={[
+          "Patient / Contact",
+          "Date",
+          "Time",
+          "Purpose / Notes",
+          "Status",
+        ]}
+      >
         {appointments.length === 0 ? (
-          <EmptyRow columns={5} message="No pending follow-ups in this date range." />
+          <EmptyRow
+            columns={5}
+            message="No pending follow-ups in this date range."
+          />
         ) : (
           appointments.map((a) => (
             <tr key={a.id} className="hover:bg-slate-50">
@@ -40,18 +63,28 @@ export default function AppointmentTable({ appointments, followUpDays, onFollowU
               <td className="whitespace-nowrap px-5 py-4">{a.time}</td>
               <td className="px-5 py-4">
                 <p>{a.purpose}</p>
-                <p className="mt-1 text-xs text-slate-500">{a.notes || "No notes"}</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {a.notes || "No notes"}
+                </p>
               </td>
               <td className="px-5 py-4">
-                <Select aria-label={`Status for ${a.patient}`} value={a.status} onChange={(e) => onStatusChange(a.id, e.target.value)}>
-                  <option>Pending</option><option>Completed</option><option>Cancelled</option>
+                <Select
+                  aria-label={`Status for ${a.patient}`}
+                  value={a.status}
+                  onChange={(e) => onStatusChange(a.id, e.target.value)}
+                >
+                  <option>Pending</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
                 </Select>
               </td>
             </tr>
           ))
         )}
       </Table>
-      <p className="border-t border-slate-100 px-5 py-3 text-xs text-slate-400">Appointment deletion is available only in the Admin Dashboard.</p>
+      <p className="border-t border-slate-100 px-5 py-3 text-xs text-slate-400">
+        Appointment deletion is available only in the Admin Dashboard.
+      </p>
     </section>
   );
 }
