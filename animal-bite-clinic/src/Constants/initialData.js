@@ -32,7 +32,7 @@ export const emptyPatient = {
 
 export const emptyAppointment = {
   patient: "", contact: "", date: "", time: "",
-  purpose: "", notes: "", status: "Pending",
+  purpose: "Vaccination follow-up", notes: "", status: "Pending",
 };
 
 export const emptyBill = {

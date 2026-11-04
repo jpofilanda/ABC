@@ -1,7 +1,13 @@
 import { ChevronRight, ShieldCheck, Stethoscope, X } from "lucide-react";
 import { navItems } from "../../constants/navItems";
 
-export default function Sidebar({ activePage, isOpen, onNavigate, onClose }) {
+export default function Sidebar({
+  activePage,
+  isOpen,
+  role,
+  onNavigate,
+  onClose,
+}) {
   return (
     <>
       <aside
@@ -29,19 +35,21 @@ export default function Sidebar({ activePage, isOpen, onNavigate, onClose }) {
             Workspace
           </p>
           <nav className="space-y-1">
-            {navItems.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => onNavigate(id)}
-                className={`flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold transition ${activePage === id ? "bg-blue-600 text-white shadow-md shadow-blue-100" : "text-slate-600 hover:bg-slate-100"}`}
-              >
-                <Icon size={19} />
-                <span>{label}</span>
-                {activePage === id && (
-                  <ChevronRight size={16} className="ml-auto" />
-                )}
-              </button>
-            ))}
+            {navItems
+              .filter((item) => !item.adminOnly || role === "admin")
+              .map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => onNavigate(id)}
+                  className={`flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold transition ${activePage === id ? "bg-blue-600 text-white shadow-md shadow-blue-100" : "text-slate-600 hover:bg-slate-100"}`}
+                >
+                  <Icon size={19} />
+                  <span>{label}</span>
+                  {activePage === id && (
+                    <ChevronRight size={16} className="ml-auto" />
+                  )}
+                </button>
+              ))}
           </nav>
         </div>
 

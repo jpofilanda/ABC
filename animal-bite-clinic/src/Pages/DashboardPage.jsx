@@ -8,6 +8,7 @@ export default function DashboardPage({
   patients,
   appointments,
   bills,
+  adminMode,
   onViewAppointments,
   onAddPatient,
   onAddAppointment,
@@ -63,6 +64,7 @@ export default function DashboardPage({
           onViewAll={onViewAppointments}
         />
         <QuickActions
+          adminMode={adminMode}
           onAddPatient={onAddPatient}
           onAddAppointment={onAddAppointment}
           onAddBill={onAddBill}

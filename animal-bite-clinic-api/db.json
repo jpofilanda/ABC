@@ -1,5 +1,111 @@
 {
-  "patients": [],
-  "appointments": [],
-  "bills": []
+  "patients": [
+    {
+      "name": "Jayson",
+      "age": "23",
+      "sex": "Male",
+      "contact": "09123456789",
+      "exposure": "Scratch",
+      "animal": "Cat",
+      "ownership": "Owned",
+      "bleeding": "No",
+      "hypertension": "No",
+      "id": 1793779013763,
+      "date": "2026-11-04"
+    },
+    {
+      "name": "Edward",
+      "age": "12",
+      "sex": "Male",
+      "contact": "09845613857",
+      "exposure": "Bite",
+      "animal": "Dog",
+      "ownership": "Stray",
+      "bleeding": "Yes",
+      "hypertension": "No",
+      "id": 1793793607610,
+      "date": "2026-11-04"
+    },
+    {
+      "name": "sdfa",
+      "age": "34",
+      "sex": "Female",
+      "contact": "09438431534",
+      "exposure": "Bite",
+      "animal": "Dog",
+      "ownership": "Owned",
+      "bleeding": "No",
+      "hypertension": "No",
+      "id": 1793795131580,
+      "date": "2026-11-04"
+    }
+  ],
+  "appointments": [
+    {
+      "patient": "Jayson",
+      "contact": "09123456789",
+      "date": "2026-11-10",
+      "time": "08:00",
+      "purpose": "",
+      "notes": "",
+      "status": "Pending",
+      "id": 1793779072772
+    },
+    {
+      "patient": "Jayson",
+      "contact": "09123456789",
+      "date": "2026-11-06",
+      "time": "20:25",
+      "purpose": "",
+      "notes": "Hatdog aosdhfauehfls asdfush as;dfe",
+      "status": "Pending",
+      "id": 1793791521858
+    },
+    {
+      "patient": "Jayson",
+      "contact": "09123456789",
+      "date": "2026-11-06",
+      "time": "21:32",
+      "purpose": "Vaccination follow-up",
+      "notes": "sdfasf",
+      "status": "Pending",
+      "id": 1793791965328
+    }
+  ],
+  "bills": [
+    {
+      "patient": "Jayson",
+      "service": "Vaccination",
+      "method": "Cash",
+      "reference": "",
+      "date": "2026-11-04",
+      "amount": "500",
+      "id": 1793779104532
+    },
+    {
+      "patient": "Jayson",
+      "service": "Wound assessment",
+      "method": "Online payment",
+      "reference": "REF-451685324",
+      "date": "2026-11-04",
+      "amount": "300",
+      "id": 1793779152908
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "name": "Clinic Admin",
+      "role": "admin",
+      "passwordHash": "$2b$10$4SLZ6/IuzEw3xq26aoMxsOkYmOnzKUM2BtEasiLF96Dl.A3FgQ2vO"
+    },
+    {
+      "id": 2,
+      "username": "staff",
+      "name": "Clinic Staff",
+      "role": "staff",
+      "passwordHash": "$2b$10$OtChAnqWN3pKUcZShX0jBOVciJdxFHoMrL83goeQG77rcavkHI6k6"
+    }
+  ]
 }

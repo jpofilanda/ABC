@@ -6,7 +6,7 @@ import Table from "../ui/Table";
 
 export default function AdminAppointmentTable({ appointments, adminMode, onDelete }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+    <section className="mb-6 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
       <div className="border-b border-slate-100 p-5">
         <h3 className="font-bold">Manage appointments</h3>
         <p className="mt-1 text-xs text-slate-500">{appointments.length} appointment records</p>

@@ -2,6 +2,7 @@ import { Plus, ShieldCheck } from "lucide-react";
 import Button from "../ui/Button";
 
 export default function QuickActions({
+  adminMode,
   onAddPatient,
   onAddAppointment,
   onAddBill,
@@ -18,12 +19,14 @@ export default function QuickActions({
         <Button onClick={onAddAppointment}>
           <Plus size={17} /> New appointment
         </Button>
-        <Button variant="secondary" onClick={onAddBill}>
+        <Button variant="secondary" onClick={onAddBill} className={adminMode ? "": "sm:col-span-2"}>
           <Plus size={17} /> Add billing record
         </Button>
-        <Button variant="secondary" onClick={onOpenAdmin}>
-          <ShieldCheck size={17} /> Admin dashboard
-        </Button>
+        {adminMode && (
+          <Button variant="secondary" onClick={onOpenAdmin}>
+            <ShieldCheck size={17} /> Admin dashboard
+          </Button>
+        )}
       </div>
     </section>
   );

@@ -10,6 +10,7 @@ import AppointmentsPage from "./pages/AppointmentsPage";
 import BillingPage from "./pages/BillingPage";
 import DashboardPage from "./pages/DashboardPage";
 import PatientsPage from "./pages/PatientsPage";
+import LoginPage from "./Components/auth/LoginPage";
 
 import { navItems } from "./constants/navItems";
 import {
@@ -17,7 +18,7 @@ import {
   emptyBill,
   emptyPatient,
 } from "./constants/initialData";
-import { api } from "./services/api";
+import { api, auth, setUnauthorizedHandler } from "./services/api";
 import { today } from "./utils/date";
 
 const makeFieldUpdater = (setter) => (field, value) =>
@@ -29,16 +30,6 @@ function App() {
   const [appointments, setAppointments] = useState([]);
   const [bills, setBills] = useState([]);
 
-  useEffect(() => {
-    Promise.all([api.getPatients(), api.getAppointments(), api.getBills()])
-      .then(([p, a, b]) => {
-        setPatients(p);
-        setAppointments(a);
-        setBills(b);
-      })
-      .catch(() => notify("Cannot reach the server. Is the API running?"), []);
-  });
-
   const [patientForm, setPatientForm] = useState(emptyPatient);
   const [appointmentForm, setAppointmentForm] = useState(emptyAppointment);
   const [billForm, setBillForm] = useState(emptyBill);
@@ -48,8 +39,36 @@ function App() {
   const [followUpDays, setFollowUpDays] = useState("7");
   const [patientFilter, setPatientFilter] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [adminMode, setAdminMode] = useState(false);
+  const [user, setUser] = useState(() => auth.getUser());
+  const adminMode = user?.role === "admin";
   const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    Promise.all([api.getPatients(), api.getAppointments(), api.getBills()])
+      .then(([p, a, b]) => {
+        setPatients(p);
+        setAppointments(a);
+        setBills(b);
+      })
+      .catch((err) => notify(err.message));
+  }, [user]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => setUser(null));
+  }, []);
+
+  useEffect(() => {
+    if(!user) return
+
+    const check = () => {
+      api.getPatients().catch(() => {})
+    }
+
+    const timer = setInterval(check, 5000)
+    return () => clearInterval(timer)
+
+  }, [user])
 
   const notify = (message) => {
     setNotice(message);
@@ -133,9 +152,7 @@ function App() {
       notify("Admin access is required.");
       return;
     }
-    if (
-      window.confirm("Delete this appointment permanently from this browser?")
-    ) {
+    if (window.confirm("Delete this appointment permanently?")) {
       try {
         await api.deleteAppointment(id);
         setAppointments((old) => old.filter((a) => a.id !== id));
@@ -146,17 +163,71 @@ function App() {
     }
   };
 
-  const toggleAdminMode = () => {
-    setAdminMode(!adminMode);
-    notify(
-      adminMode ? "Admin demo mode disabled." : "Admin demo mode enabled.",
-    );
+  const deletePatient = async (id) => {
+    if (!adminMode) {
+      notify("Admin access is required");
+      return;
+    }
+    if (
+      window.confirm(
+        "Delete this patient record permanently? Their appointments and billing records will be keet.",
+      )
+    ) {
+      try {
+        await api.deletePatient(id);
+        setPatients((old) => old.filter((p) => p.id !== id));
+        notify("Patient record removed.");
+      } catch (err) {
+        notify(err.message);
+      }
+    }
+  };
+
+  const deleteBill = async (id) => {
+    if (!adminMode) {
+      notify("Admin access is required.");
+      return;
+    }
+    if (
+      window.confirm(
+        "Delete this billing record permanently? This cannot be undone.",
+      )
+    ) {
+      try {
+        await api.deleteBill(id);
+        setBills((old) => old.filter((b) => b.id !== id));
+        notify("Billing record removed.");
+      } catch (err) {
+        notify(err.message);
+      }
+    }
+  };
+
+  const handleLogin = async (username, password) => {
+    const { token, user } = await api.login(username, password);
+    auth.setSession(token, user);
+    setUser(user);
+    setPage("dashboard");
+  };
+
+  const handleLogout = () => {
+    auth.clear();
+    setUser(null);
+    setPatients([]);
+    setAppointments([]);
+    setBills([]);
+  };
+
+  const openAdmin = () => {
+    adminMode ? setPage("admin") : notify("Admin access is required");
   };
 
   const navigate = (id) => {
     setPage(id);
     setMobileMenu(false);
   };
+
+  if (!user) return <LoginPage onLogin={handleLogin} />;
 
   const pageTitle = navItems.find((n) => n.id === page)?.label || "Dashboard";
 
@@ -165,6 +236,7 @@ function App() {
       <Sidebar
         activePage={page}
         isOpen={mobileMenu}
+        role={user.role}
         onNavigate={navigate}
         onClose={() => setMobileMenu(false)}
       />
@@ -172,8 +244,9 @@ function App() {
       <main className="min-h-screen lg:ml-64">
         <Header
           title={pageTitle}
-          adminMode={adminMode}
+          user={user}
           onOpenMenu={() => setMobileMenu(true)}
+          onLogout={handleLogout}
         />
 
         <div className="mx-auto max-w-[1500px] p-4 sm:p-8">
@@ -184,6 +257,7 @@ function App() {
               patients={patients}
               appointments={appointments}
               bills={bills}
+              adminMode={adminMode}
               onViewAppointments={() => setPage("appointments")}
               onAddPatient={() => {
                 setPage("patients");
@@ -197,7 +271,7 @@ function App() {
                 setPage("billing");
                 setShowBillForm(true);
               }}
-              onOpenAdmin={() => setPage("admin")}
+              onOpenAdmin={openAdmin}
             />
           )}
 
@@ -242,12 +316,16 @@ function App() {
             />
           )}
 
-          {page === "admin" && (
+          {page === "admin" && adminMode && (
             <AdminPage
+              patients={patients}
               appointments={appointments}
+              bills={bills}
               adminMode={adminMode}
-              onToggleAdminMode={toggleAdminMode}
+              currentUserId={user.id}
+              onDeletePatient={deletePatient}
               onDeleteAppointment={deleteAppointment}
+              onDeleteBill={deleteBill}
             />
           )}
 
