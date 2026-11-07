@@ -7,6 +7,7 @@ import Field from "../ui/Field";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Table from "../ui/Table";
+import SearchInput from "../ui/SearchInput";
 
 const emptyUser = { name: "", username: "", password: "", role: "staff" };
 
@@ -14,6 +15,14 @@ export default function AdminUserTable({ users, setUsers, currentUserId }) {
   const [form, setForm] = useState(emptyUser);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
+
+  const [filter, setFilter] = useState("");
+
+  const shown = users.filter((u) =>
+    `${u.name} ${u.username} ${u.role}`
+      .toLowerCase()
+      .includes(filter.trim().toLowerCase()),
+  );
 
   const change = (field, value) =>
     setForm((old) => ({ ...old, [field]: value }));
@@ -52,11 +61,16 @@ export default function AdminUserTable({ users, setUsers, currentUserId }) {
       <div className="flex flex-col gap-3 border-b border-slate-100 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="font-bold">Manage users</h3>
-          <p className="mt-1 text-xs text-slate-500">{users.length} accounts</p>
+          <p className="mt-1 text-xs text-slate-500 mb-2">
+            {filter ? `${shown.length} of ${users.length}` : users.length} accounts
+          </p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          <Plus size={17} /> Add user
-        </Button>
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <SearchInput value={filter} onChange={setFilter}  placeholder="Search by name or username" />
+          {showForm ? "" : <Button  className="w-40" onClick={() => setShowForm(!showForm)}>
+            <Plus size={17} /> Add user
+          </Button> }
+        </div>
       </div>
 
       {error && (
@@ -118,10 +132,10 @@ export default function AdminUserTable({ users, setUsers, currentUserId }) {
       )}
 
       <Table columns={["Name", "Username", "Role", "Admin action"]}>
-        {users.length === 0 ? (
-          <EmptyRow columns={4} />
+        {shown.length === 0 ? (
+          <EmptyRow columns={4} message={filter ? "No users match your search." : "No records found."} />
         ) : (
-          users.map((u) => (
+          shown.map((u) => (
             <tr key={u.id} className="hover:bg-slate-50">
               <td className="px-5 py-4 font-semibold">{u.name}</td>
               <td className="px-5 py-4">{u.username}</td>

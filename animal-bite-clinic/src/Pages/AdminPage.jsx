@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import AdminAppointmentTable from "../Components/admin/AdminAppointmentTable";
 import AdminBillTable from "../Components/admin/AdminBillTable";
+import AdminEditForm, { getFields } from "../Components/admin/AdminEditForm";
 import AdminPatientTable from "../Components/admin/AdminPatientTable";
 import AdminUserTable from "../Components/admin/AdminUserTable";
 import SectionTitle from "../Components/ui/SectionTitle";
 import { api } from "../services/api";
+
+const editTitles = {
+  patients: "Edit patient record",
+  appointments: "Edit appointment",
+  bills: "Edit billing record",
+};
 
 export default function AdminPage({
   patients,
@@ -12,26 +19,26 @@ export default function AdminPage({
   bills,
   adminMode,
   currentUserId,
-  onDeleteAppointment,
+  onUpdatePatient,
+  onUpdateAppointment,
+  onUpdateBill,
   onDeletePatient,
+  onDeleteAppointment,
   onDeleteBill,
 }) {
   const [tab, setTab] = useState("patients");
-  const [patientFilter, setPatientFilter] = useState("");
   const [users, setUsers] = useState([]);
-
-  const filteredPatients = patients.filter((p) =>
-    `${p.name} ${p.contact}`
-      .toLowerCase()
-      .includes(patientFilter.trim().toLowerCase()),
-  );
+  const [editing, setEditing] = useState(null);
 
   useEffect(() => {
-    api
-      .getUsers()
-      .then(setUsers)
-      .catch(() => {});
+    api.getUsers().then(setUsers).catch(() => {});
   }, []);
+
+  const updaters = {
+    patients: onUpdatePatient,
+    appointments: onUpdateAppointment,
+    bills: onUpdateBill,
+  };
 
   const tabs = [
     { id: "patients", label: `Patients (${patients.length})` },
@@ -40,12 +47,14 @@ export default function AdminPage({
     { id: "users", label: `Users (${users.length})` },
   ];
 
+  const startEdit = (kind) => (record) => setEditing({ kind, record });
+
   return (
     <>
       <SectionTitle
         eyebrow="Restricted management"
         title="Records management"
-        description="Review and remove records and manage accounts. Admin only."
+        description="Review, edit and remove records and manage accounts. Admin only."
       />
 
       <div className="mb-6 flex flex-wrap gap-2" role="tablist">
@@ -54,7 +63,10 @@ export default function AdminPage({
             key={id}
             role="tab"
             aria-selected={tab === id}
-            onClick={() => setTab(id)}
+            onClick={() => {
+              setTab(id);
+              setEditing(null);
+            }}
             className={`min-h-10 rounded-xl px-4 text-sm font-semibold transition ${
               tab === id
                 ? "bg-blue-600 text-white"
@@ -64,15 +76,29 @@ export default function AdminPage({
             {label}
           </button>
         ))}
+        
       </div>
+
+      {editing && editing.kind === tab && (
+        <AdminEditForm
+          key={editing.record.id}
+          title={editTitles[tab]}
+          fields={getFields(tab, patients, editing.record)}
+          record={editing.record}
+          onCancel={() => setEditing(null)}
+          onSave={async (data) => {
+            const ok = await updaters[tab](editing.record.id, data);
+            if (ok) setEditing(null);
+            return ok;
+          }}
+        />
+      )}
 
       {tab === "patients" && (
         <AdminPatientTable
-          patients={filteredPatients}
-          totalCount={patients.length}
-          filter={patientFilter}
-          onFilterChange={setPatientFilter}
+          patients={patients}
           adminMode={adminMode}
+          onEdit={startEdit("patients")}
           onDelete={onDeletePatient}
         />
       )}
@@ -80,6 +106,7 @@ export default function AdminPage({
         <AdminAppointmentTable
           appointments={appointments}
           adminMode={adminMode}
+          onEdit={startEdit("appointments")}
           onDelete={onDeleteAppointment}
         />
       )}
@@ -87,15 +114,12 @@ export default function AdminPage({
         <AdminBillTable
           bills={bills}
           adminMode={adminMode}
+          onEdit={startEdit("bills")}
           onDelete={onDeleteBill}
         />
       )}
       {tab === "users" && (
-        <AdminUserTable
-          users={users}
-          setUsers={setUsers}
-          currentUserId={currentUserId}
-        />
+        <AdminUserTable users={users} setUsers={setUsers} currentUserId={currentUserId} />
       )}
     </>
   );

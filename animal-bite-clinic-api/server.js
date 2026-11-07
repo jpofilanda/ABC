@@ -61,6 +61,7 @@ const seedUser = () => {
 
 seedUser();
 
+// Authentication
 const requireAuth = (req, res, next) => {
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
@@ -134,22 +135,9 @@ app.post("/api/auth/login", (req, res) => {
 
 app.use("/api", requireAuth);
 
+// Patients
 app.get("/api/patients", (req, res) => {
   res.json(load().patients);
-});
-
-app.delete("/api/patients/:id", requireRole("admin"), (req, res) => {
-  const db = load();
-  const id = Number(req.params.id);
-
-  if (!db.patients.some((p) => p.id === id)) {
-    return res.status(404).json({
-      message: "Patient not found",
-    });
-  }
-  db.patients = db.patients.filter((p) => p.id !== id);
-  save(db);
-  res.status(204).end();
 });
 
 app.post("/api/patients", (req, res) => {
@@ -169,6 +157,63 @@ app.post("/api/patients", (req, res) => {
   res.status(201).json(patient);
 });
 
+app.patch("/api/patients/:id", requireRole("admin"), (req, res) => {
+  const db = load();
+  const patient = db.patients.find((p) => p.id === Number(req.params.id));
+
+  if (!patient)
+    return res.status(404).json({
+      message: "Patient not found",
+    });
+
+  const {
+    name,
+    age,
+    sex,
+    contact,
+    exposure,
+    animal,
+    ownership,
+    bleeding,
+    hypertension,
+  } = req.body;
+
+  if (!name || !age || !contact) {
+    return res.status(400).json({
+      message: "Name, age and contact are required",
+    });
+  }
+
+  Object.assign(patient, {
+    name,
+    age,
+    sex,
+    contact,
+    exposure,
+    animal,
+    ownership,
+    bleeding,
+    hypertension,
+  });
+  save(db);
+  res.json(patient);
+});
+
+app.delete("/api/patients/:id", requireRole("admin"), (req, res) => {
+  const db = load();
+  const id = Number(req.params.id);
+
+  if (!db.patients.some((p) => p.id === id)) {
+    return res.status(404).json({
+      message: "Patient not found",
+    });
+  }
+  db.patients = db.patients.filter((p) => p.id !== id);
+  save(db);
+  res.status(204).end();
+});
+
+// Appointment
 app.get("/api/appointments", (req, res) => {
   res.json(load().appointments);
 });
@@ -205,6 +250,39 @@ app.patch("/api/appointments/:id", (req, res) => {
   res.json(item);
 });
 
+app.patch("/api/appointments/:id", (req, res) => {
+  const db = load();
+
+  const appointment = db.appointments.find(
+    (a) => a.id === Number(req.params.id),
+  );
+
+  if (!appointment)
+    return res.status(404).json({
+      message: "Appointment not found",
+    });
+
+  const { patient, contact, date, time, purpose, notes, status } = req.body;
+
+  if (!patient || !date || !time) {
+    return res.status(400).json({
+      message: "Patient, date and time are required",
+    });
+  }
+
+  Object.assign(appointment, {
+    patient,
+    contact,
+    date,
+    time,
+    purpose,
+    notes,
+    status,
+  });
+  save(db);
+  res.json(appointment);
+});
+
 app.delete("/api/appointments/:id", requireRole("admin"), (req, res) => {
   const db = load();
   db.appointments = db.appointments.filter(
@@ -214,6 +292,7 @@ app.delete("/api/appointments/:id", requireRole("admin"), (req, res) => {
   res.status(204).end();
 });
 
+// Bills
 app.get("/api/bills", (req, res) => {
   res.json(load().bills);
 });
@@ -232,6 +311,27 @@ app.post("/api/bills", (req, res) => {
   res.status(201).json(bill);
 });
 
+app.patch("/api/bills/:id", requireRole("admin"), (req, res) => {
+  const db = load();
+  const bill = db.bills.find((b) => b.id === Number(req.params.id));
+  if (!bill)
+    return res.status(404).json({
+      message: "Bill not found",
+    });
+
+  const { patient, service, method, reference, date, amount } = req.body;
+
+  if (!patient || !amount) {
+    return res.status(400).json({
+      message: "Patient and amount are required",
+    });
+  }
+
+  Object.assign(bill, { patient, service, method, reference, date, amount });
+  save(db);
+  res.json(bill);
+});
+
 app.delete("/api/bills/:id", requireRole("admin"), (req, res) => {
   const db = load();
   const id = Number(req.params.id);
@@ -247,6 +347,7 @@ app.delete("/api/bills/:id", requireRole("admin"), (req, res) => {
   res.status(204).end();
 });
 
+// Users
 app.get("/api/users", requireRole("admin"), (req, res) => {
   res.json(load().users.map(({ passwordHash, ...safe }) => safe));
 });

@@ -59,16 +59,15 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if(!user) return
+    if (!user) return;
 
     const check = () => {
-      api.getPatients().catch(() => {})
-    }
+      api.getPatients().catch(() => {});
+    };
 
-    const timer = setInterval(check, 5000)
-    return () => clearInterval(timer)
-
-  }, [user])
+    const timer = setInterval(check, 5000);
+    return () => clearInterval(timer);
+  }, [user]);
 
   const notify = (message) => {
     setNotice(message);
@@ -203,6 +202,42 @@ function App() {
     }
   };
 
+  const editPatient = async (id, data) => {
+    try {
+      const updated = await api.updatePatient(id, data);
+      setPatients((old) => old.map((p) => (p.id === id ? updated : p)));
+      notify("Patient record updated.");
+      return true;
+    } catch (err) {
+      notify(err.message);
+      return false;
+    }
+  };
+
+  const editAppointment = async (id, data) => {
+    try {
+      const updated = await api.updateAppointment(id, data);
+      setAppointments((old) => old.map((b) => (b.id === id ? updated : b)));
+      notify("Appointment record updated.");
+      return true;
+    } catch (err) {
+      notify(err.message);
+      return false;
+    }
+  };
+
+  const editBill = async (id, data) => {
+    try {
+      const updated = await api.udpateBill(id, data);
+      setBills((old) => old.map((b) => (b.id === id ? updated : b)));
+      notify("Billing record updated.");
+      return true;
+    } catch (err) {
+      notify(err.message);
+      return false;
+    }
+  };
+
   const handleLogin = async (username, password) => {
     const { token, user } = await api.login(username, password);
     auth.setSession(token, user);
@@ -323,6 +358,9 @@ function App() {
               bills={bills}
               adminMode={adminMode}
               currentUserId={user.id}
+              onUpdatePatient={editPatient}
+              onUpdateAppointment={editAppointment}
+              onUpdateBill={editBill}
               onDeletePatient={deletePatient}
               onDeleteAppointment={deleteAppointment}
               onDeleteBill={deleteBill}

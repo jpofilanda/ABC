@@ -55,6 +55,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+  updatePatient: (id, data) => request(`/patients/${id}`, {method: "PATCH", body: JSON.stringify(data)}),
   deletePatient: (id) =>
     request(`/patients/${id}`, {
       method: "DELETE",
@@ -77,6 +78,7 @@ export const api = {
   getBills: () => request("/bills"),
   addBill: (data) =>
     request("/bills", { method: "POST", body: JSON.stringify(data) }),
+  udpateBill: (id, data) => reques(`/bills/${id}`, {method: "PATCH", body: JSON.stringify(data)}),
   deleteBill: (id) => request(`/bills/${id}`, { method: "DELETE" }),
 
   getUsers: () => request("/users"),
